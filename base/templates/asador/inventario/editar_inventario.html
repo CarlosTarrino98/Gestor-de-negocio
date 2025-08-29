@@ -1,0 +1,15 @@
+<!-- inventario/editar_inventario.html -->
+{% extends 'base/base_asador.html' %}
+
+{% block content %}
+    <h1 class="titulo">Editar Inventario</h1>
+    <form method="post" class="generic-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="button-row">
+            <a href="{% url 'lista_inventario' %}" class="return">Volver</a>
+            <button type="submit" class="crear">Guardar</button>
+        </div>
+    </form>
+{% endblock %}

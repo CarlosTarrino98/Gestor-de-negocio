@@ -1,0 +1,332 @@
+{% extends 'base/base_asador.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles\asador\balance\balance.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="titulo">Balance del Asador</h1>
+
+    <!-- Filtros de fecha -->
+    <form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'balance_asador' %}">
+        <div class="fecha-fila">
+            <div class="filtro-item">
+                <label for="fechaInicio">Desde:</label>
+                <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+            </div>
+
+            <div class="filtro-item">
+                <label for="fechaFin">Hasta:</label>
+                <input type="date" id="fechaFin" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+            </div>
+        </div>
+
+        <div class="boton-container">
+            <button type="submit">Filtrar</button>
+        </div>
+    </form>
+
+    <div class="graficos-container">
+        <div class="graficos-sub-container">
+            <!-- Gráfico de barras Ventas, Gastos y Beneficios -->
+            <div class="grafico" id="grafico1">
+                <h3>Ventas, Gastos y Beneficios</h3>
+                <canvas id="graficoVentasGastosBeneficios"></canvas>
+            </div>
+
+            <!-- Gráfico Circular de Pollos y Cachopos -->
+            <div class="grafico" id="grafico2">
+                <h3>Pollos y Cachopos</h3>
+                <canvas id="graficoPollosCachopos"></canvas>
+                <p><strong>Total de pedidos:</strong> {{ numero_pedidos }}</p>
+            </div>
+        </div>
+        <div class="graficos-sub-container">
+            <!-- Gráfico de lineas de Ventas por Fecha -->
+            <div class="grafico" id="grafico3" style="display: none;">
+                <h3>Evolución de ventas</h3>
+                <canvas id="graficoVentasLineas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Conversión de los datos pasados desde Django al formato JavaScript
+        const resumenVentas = JSON.parse('{{ resumen_ventas|escapejs }}');
+        const gastos = JSON.parse('{{ gastos|escapejs }}');
+
+        const totalVentas = Number("{{ total_ventas|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalGastos = Number("{{ total_gastos|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalBeneficios = Number("{{ total_beneficios|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const numeroPedidos = Number("{{ numero_pedidos|default:'0' }}");
+        const totalPollos = Number("{{ total_pollos|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalCachopos = Number("{{ total_cachopos|default:'0' }}");
+
+        // Gráfico de Ventas, Gastos y Beneficios
+        const ctx = document.getElementById('graficoVentasGastosBeneficios').getContext('2d');
+        const graficoVentasGastosBeneficios = new Chart(ctx, {
+            type: 'bar',  // Tipo de gráfico
+            data: {
+                labels: ['Ventas', 'Gastos', 'Beneficios'],  // Etiquetas del eje X
+                datasets: [{
+                    data: [totalVentas, totalGastos, totalBeneficios],  // Datos a graficar
+                    backgroundColor: [
+                        'rgba(139, 69, 19, 0.6)',  // Color cálido marrón para ventas
+                        'rgba(255, 0, 0, 0.6)',     // Color rojo para gastos
+                        'rgba(0, 128, 0, 0.6)'      // Color verde para beneficios
+                    ],
+                    borderColor: [
+                        'rgba(139, 69, 19, 1)',  // Borde marrón para ventas
+                        'rgba(255, 0, 0, 1)',    // Borde rojo para gastos
+                        'rgba(0, 128, 0, 1)'     // Borde verde para beneficios
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // No mostrar la leyenda
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const total = totalVentas + totalGastos;
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(2);
+                                return `${value}€ - (${percentage}%)`;
+                            },
+                            labelTextColor: function() {
+                                return 'rgba(255, 255, 255, 1)';
+                            }
+                        },
+                        titleFont: {
+                            size: 24,
+                            weight: 'bold',
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        bodyFont: {
+                            size: 20,
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        displayColors: false,
+                        backgroundColor: '#1a0e06',
+                        borderColor: '#1a0e06',
+                        borderWidth: 1,
+                        xPadding: 10,
+                        yPadding: 10
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                family: 'Arial',
+                                size: 22,
+                                weight: 'bold',
+                                color: 'rgba(0, 0, 0, 1)'
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                family: 'Arial',
+                                size: 22,
+                                weight: 'bold',
+                                color: 'rgba(0, 0, 0, 1)'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico Circular de Pollos y Cachopos
+        const ctxCircular = document.getElementById('graficoPollosCachopos').getContext('2d');
+        const graficoPollosCachopos = new Chart(ctxCircular, {
+            type: 'pie',  // Tipo de gráfico
+            data: {
+                labels: ['Pollos', 'Cachopos'],  // Etiquetas del gráfico (pueden quedar vacías)
+                datasets: [{
+                    data: [totalPollos, totalCachopos],  // Datos a graficar
+                    backgroundColor: [
+                        '#fff', 
+                        '#4b3a2f'   
+                    ],
+                    borderColor: [
+                        '#fff',  
+                        '#4b3a2f' 
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'bottom',  // Posición de la leyenda
+                        align: 'center',
+                        labels: {
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                return [{
+                                    text: `Pollos`,
+                                    fillStyle: '#fff', // Color de fondo para Pollos
+                                    strokeStyle: '#fff',
+                                    hidden: false,
+                                },
+                                {
+                                    text: `Cachopos`,
+                                    fillStyle: '#4b3a2f', // Color de fondo para Cachopos
+                                    strokeStyle: '#4b3a2f',
+                                    hidden: false,
+                                }];
+                            },
+                            color: '#4b3a2f', // Color del texto de la leyenda
+                            font: {
+                                family: 'Arial',
+                                weight: '400',
+                                size: 20,
+                                color: 'rgba(0, 0, 0, 1)'
+                            },
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(2); // Calcular el porcentaje
+                                return `${value} (${percentage}%)`; // Mostrar valor y porcentaje
+                            }
+                        },
+                        titleFont: {
+                            size: 24,
+                            weight: 'bold',
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        bodyFont: {
+                            size: 20,
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        displayColors: false,
+                        backgroundColor: '#1a0e06',
+                        borderColor: '#1a0e06',
+                        borderWidth: 1,
+                        xPadding: 10,
+                        yPadding: 10
+                    }
+                }
+            }
+        });
+
+        // Gráfico de líneas resumen de ventas por fecha
+        // Verificar si hay más de un registro en resumenVentas y si hay más de un registro, crear el gráfico de líneas       
+        if (resumenVentas.length > 1) {
+            // Mostrar el contenedor del gráfico
+            document.getElementById('grafico3').style.display = 'block';
+            
+            // Función para formatear la fecha a dd/mm/yyyy
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');  // Asegurar que el día tiene dos dígitos
+                const month = String(date.getMonth() + 1).padStart(2, '0');  // Mes es de 0 a 11, así que sumamos 1
+                return `${day}/${month}`;
+            }
+
+            const fechas = resumenVentas.map(item => formatDate(item.fecha));  // Extraer las fechas
+            const ventas = resumenVentas.map(item => item.total_ventas);  // Extraer las ventas
+            
+            const ctx = document.getElementById('graficoVentasLineas').getContext('2d');
+            
+            const graficoVentasLineas = new Chart(ctx, {
+                type: 'line',  // Tipo de gráfico de líneas
+                data: {
+                    labels: fechas,  // Etiquetas del eje X (fechas)
+                    datasets: [{
+                        label: 'Total Ventas',
+                        data: ventas,  // Datos de las ventas
+                        fill: false,  // No rellenar el área bajo la línea
+                        borderColor: 'rgba(255, 165, 0, 1)',  // Color de la línea
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false  // Eliminar la leyenda
+                        },
+                        tooltip: {  
+                            callbacks: {
+                                // Personalizar el título del tooltip (fecha)
+                                title: function(tooltipItem) {
+                                    const fecha = tooltipItem[0].label;  // Obtener la fecha de la etiqueta
+                                    return `Fecha: ${fecha}`;  // Mostrar la fecha
+                                },
+                                // Personalizar el cuerpo del tooltip (ventas)
+                                label: function(tooltipItem) {
+                                    const valorVentas = tooltipItem.raw;  // Obtener el valor de ventas
+                                    return `Total Ventas: ${valorVentas}€`;  // Mostrar las ventas con €
+                                }
+                            },                      
+                            titleFont: {
+                                size: 24,
+                                weight: 'bold',
+                                family: 'Arial',
+                                color: 'rgba(255, 255, 255, 1)'
+                            },
+                            bodyFont: {
+                                size: 20,
+                                family: 'Arial',
+                                color: 'rgba(255, 255, 255, 1)'
+                            },
+                            displayColors: false,
+                            backgroundColor: '#1a0e06',
+                            borderColor: '#1a0e06',
+                            borderWidth: 1,
+                            xPadding: 10,
+                            yPadding: 10
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: false,
+                            },
+                            ticks: {
+                                font: {
+                                    size: 22  // Aumentar tamaño de las etiquetas del eje X
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: false,
+                            },
+                            beginAtZero: true,  // Comenzar el eje Y desde cero
+                            ticks: {
+                                font: {
+                                    size: 22  // Aumentar tamaño de las etiquetas del eje Y
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}
+

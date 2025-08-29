@@ -1,0 +1,92 @@
+{% extends 'base/base_asador.html' %}
+
+{% block content %}
+{% load static %}
+
+<h1 class="titulo">Lista de Menús</h1>
+
+<div class="div-container">
+    <a href="{% url 'crear_menu' %}" class="crear">Crear nuevo menú</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">Nombre</th>
+                <th style="width: 15%;">Precio (€)</th>
+                <th style="width: 35%;">Productos</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for menu in menus %}
+            <tr id="menu-{{ menu.id }}">
+                <td>{{ menu.nombre }}</td>
+                <td>{{ menu.precio }}</td>
+                <td>
+                    <ul>
+                        {% for menu_producto in menu.menuproducto_set.all %}
+                            <li>{{ menu_producto.cantidad }} x {{ menu_producto.producto.nombre }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>            
+                <td>
+                    <a href="{% url 'editar_menu' menu.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_menus' %}" style="display:inline;" class="form-eliminar" data-menu-id="{{ menu.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este menú?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No hay menús disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Manejo de la eliminación de un menú
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const menuId = form.data('menu-id'); // ID del menú a eliminar
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'accion': 'eliminar',
+                    'menu_id': menuId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Eliminar la fila del menú de la tabla
+                        $(`#menu-${menuId}`).remove();
+                        location.reload();
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar el menú.').css('color', 'red');
+                    }
+                },
+                error: function() {
+                    $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

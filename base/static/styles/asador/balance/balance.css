@@ -1,0 +1,134 @@
+/* Centrar el contenedor principal y el formulario */
+.filtro-fecha {
+    display: flex;
+    flex-direction: column;  /* Organiza los elementos en columna */
+    align-items: center;     /* Centra el formulario dentro de su contenedor */
+    gap: 15px;               /* Espacio entre las filas */
+    width: 30%;              /* Ajusta el ancho del formulario */
+    padding: 10px;           /* Espacio interno para el formulario */
+    margin: 0 auto;          /* Centra el formulario dentro de su contenedor */
+    margin-bottom: 20px;
+}
+
+/* Contenedor de filtros en dos columnas */
+.fecha-fila {
+    display: flex;
+    justify-content: center; /* Distribuye los filtros en dos columnas */
+    width: 70%;             /* Ocupa todo el ancho disponible */
+}
+
+/* Contenedor de cada filtro individual */
+.filtro-item {
+    display: flex;
+    flex-direction: column;  /* Coloca el label encima del input */
+    align-items: center;     /* Centra los elementos */
+    width: 100%;             /* Hace que cada columna ocupe el 50% del ancho del contenedor */
+}
+
+/* Estilo para los labels */
+.filtro-item label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px; /* Espacio entre el label y el input */
+    text-align: center;  /* Centra el texto del label */
+}
+
+/* Estilo para los inputs de fecha */
+.filtro-item input[type="date"] {
+    padding: 8px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 180px; /* Asegura que ocupe todo el ancho del filtro */
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Contenedor del botón */
+.boton-container {
+    display: flex;
+    justify-content: center; /* Centra el botón */
+    width: 100%;
+}
+
+/* Estilo para el botón */
+.filtro-fecha button {
+    background-color: #4b3a2f;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 180px;
+}
+
+/* Cambio de color cuando el botón es hover */
+.filtro-fecha button:hover {
+    background-color: #3e2c1c;
+}
+
+/* Subontenedores de los gráficos */
+.graficos-sub-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2%; /* Espacio más grande entre los gráficos */
+    margin-top: 20px; /* Espacio superior */
+}
+
+/* Contenedor para cada gráfico */
+.grafico {
+    width: 45%; /* Cada gráfico ocupará el 30% del ancho */
+    height: auto; /* Puedes ajustar la altura total de cada contenedor */
+    background-color: #f7e0c3c3; /* Fondo claro para los gráficos */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    border-radius: 10px; /* Bordes redondeados */
+    box-sizing: border-box; /* Asegura que el padding se incluya en el tamaño total */
+    display: flex;
+    flex-direction: column; /* Asegura que el título esté arriba del gráfico */
+    align-items: center; /* Centra horizontalmente el contenido dentro del contenedor */
+    justify-content: flex-start; /* Centra verticalmente el contenido */
+}
+
+#grafico3{
+    width: 60%;
+}
+
+/* Estilo para el título */
+.grafico h3 {
+    width: 100%;
+    font-size: 2rem; /* Ajusta el tamaño del texto */
+    background-color: #3e2c1c;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    padding: 20px; /* Elimina el padding para ajustarse mejor */
+    flex-shrink: 0; /* Asegura que el título no se reduzca */
+}
+
+/* Estilo para el canvas */
+.grafico canvas {
+    padding: 20px;
+    width: 100% !important; /* Ajusta al 100% del contenedor */
+    height: auto !important; /* El gráfico ocupará el 75% del contenedor */
+    max-width: 100%; /* Asegúrate de que el gráfico no se estire más de lo necesario */
+}
+
+/* Estilo para el canvas */
+#graficoPollosCachopos  {
+    max-width: 55% !important; /* Ajusta al 100% del contenedor */
+    max-height: 70%;
+}
+
+.grafico p {
+    font-size: 1.7rem;       /* Tamaño de fuente adecuado */
+    color: #4b3a2f;             /* Color de texto oscuro para buen contraste */
+    font-weight: 600;        /* Peso de fuente seminegrita */
+    text-align: center;      /* Centra el texto */
+    margin-bottom: 10px;
+}
+

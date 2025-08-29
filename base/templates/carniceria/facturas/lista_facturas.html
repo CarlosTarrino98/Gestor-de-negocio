@@ -1,0 +1,110 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block content %}
+{% load static %}
+
+<h1 class="titulo">Lista de Facturas</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_facturas' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<div class="div-container">
+    <a href="{% url 'crear_factura' %}" class="crear">Crear nueva factura</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Número de Factura</th>
+                <th style="width: 25%;">Cliente</th>
+                <th style="width: 20%;">Fecha de Emisión</th>
+                <th style="width: 20%;">Total de la Factura</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for factura in facturas %}
+            <tr id="factura-{{ factura.id }}">
+                <td>{{ factura.numero_factura }}</td>
+                <td>{{ factura.cliente.codigo }}</td>
+                <td>{{ factura.fecha_emision }}</td>
+                <td>{{ factura.total }}</td>
+                <td>
+                    <a href="{% url 'editar_factura' factura.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_facturas' %}" style="display:inline;" class="form-eliminar" data-factura-id="{{ factura.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar esta factura?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                    <a href="{% url 'previsualizar_factura' factura.id %}" class="previsualizar">
+                        <img src="{% static 'iconos/botones/previsualizar.png' %}" alt="previsualizar" />
+                    </a>
+                </td>
+            </tr>
+            {% empty %} 
+            <tr>
+                <td colspan="5" style="text-align: center;">No hay facturas disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Manejo de la eliminación de una factura
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const facturaId = form.data('factura-id'); // ID de la factura a eliminar
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'accion': 'eliminar',
+                    'factura_id': facturaId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Eliminar la fila de la factura de la tabla
+                        $(`#factura-${facturaId}`).remove();
+                        location.reload();
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar la factura.').css('color', 'red');
+                    }
+                },
+                error: function() {
+                    $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

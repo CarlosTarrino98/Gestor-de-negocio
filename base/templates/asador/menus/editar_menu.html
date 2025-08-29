@@ -1,0 +1,75 @@
+{% extends 'base/base_asador.html' %}
+
+{% block content %}
+<h1 class="titulo">Editar Menú</h1>
+
+<form method="post" class="generic-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div id="container-form-secundary">
+        <div class="form-secundary">
+            <h3>Productos</h3>
+            <div id="productos-container">
+                {% for menu_producto in menu_productos %}
+                    <div class="producto-entry">
+                        <select name="productos[{{ forloop.counter0 }}][producto]">
+                            <option value="">Seleccione un producto</option>
+                            {% for producto in productos %}
+                                <option class="categoria-{{ producto.categoria }}" value="{{ producto.id }}" {% if producto.id == menu_producto.producto.id %}selected{% endif %}>{{ producto.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="productos[{{ forloop.counter0 }}][cantidad]" min="1" value="{{ menu_producto.cantidad }}">
+                        <button type="button" class="remove-producto">Eliminar</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-product" class="crear">Agregar Producto</button>
+        </div>
+    </div>
+    <div class="button-row">
+        <a href="{% url 'lista_menus' %}" class="return">Volver</a>
+        <button type="submit" class="crear">Guardar</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('add-product').addEventListener('click', function() {
+            const container = document.getElementById('productos-container');
+            const entryCount = container.getElementsByClassName('producto-entry').length; // cuenta el número actual de entradas
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('producto-entry');
+            newEntry.innerHTML = `
+                <select name="productos[${entryCount}][producto]">
+                    <option value="">Seleccione un producto</option>
+                    {% for producto in productos %}
+                        <option value="{{ producto.id }}" class="categoria-{{ producto.categoria }}">
+                            {{ producto.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="productos[${entryCount}][cantidad]" min="1" value="1">
+                <button type="button" class="remove-producto">Eliminar</button>
+            `;
+            container.appendChild(newEntry);
+        });
+
+        // Función para eliminar un producto
+        document.getElementById('productos-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-producto')) {
+                e.target.parentElement.remove();
+                // Reajustar los índices después de eliminar
+                const entries = container.getElementsByClassName('producto-entry');
+                for (let i = 0; i < entries.length; i++) {
+                    const select = entries[i].querySelector('select');
+                    const input = entries[i].querySelector('input');
+                    select.name = `productos[${i}][producto]`;
+                    input.name = `productos[${i}][cantidad]`;
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

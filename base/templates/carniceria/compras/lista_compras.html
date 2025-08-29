@@ -1,0 +1,260 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/carniceria/lista_compras/lista_compras.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">LISTA DE COMPRAS</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_compras' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<div class="informacion">
+    <!-- Columna 1: Tabla de Facturas IVA -->
+    <div class="columna">
+        <a href="{% url 'crear_compra_iva' %}" class="crear">Nueva Factura IVA</a>
+
+        <table id="tabla-facturas-iva">
+            <thead>
+                <tr>
+                    <th colspan="6" style="text-align: center; font-size: 1.2rem;background-color: #2b211b;">FACTURAS CON IVA</th>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 25%;">Proveedor</th>
+                    <th style="width: 20%;">Nº Factura</th>
+                    <th style="width: 15%;">Total</th>
+                    <th style="width: 10%;">Pagada</th>
+                    <th style="width: 20%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factura in facturas_iva %}
+                <tr id="factura-iva-{{ factura.id }}">
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.fecha|date:"d/m/Y" }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.proveedor }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.numero_factura }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.total }} €</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.pagada|yesno:"Sí,No" }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">
+                        <a href="{% url 'editar_compra_iva' factura.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_compras' %}" style="display:inline;" class="form-eliminar" data-factura-id="{{ factura.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar_factura_iva">
+                            <input type="hidden" name="factura_id" value="{{ factura.id }}">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar esta factura?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'lista_compras' %}" style="display:inline;" class="form-marcar-pagada" data-factura-id="{{ factura.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="{% if factura.pagada %}desmarcar_pagada{% else %}marcar_pagada{% endif %}">
+                            <input type="hidden" name="factura_id" value="{{ factura.id }}">
+                            <button type="submit" class="pagada">
+                                {% if factura.pagada %}
+                                <img src="{% static 'iconos/botones/check-out.png' %}" alt="No pagada" />
+                                {% else %}
+                                <img src="{% static 'iconos/botones/check.png' %}" alt="Pagada" />
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No hay facturas disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Columna 2: Tabla de Facturas Tienda -->
+    <div class="columna">
+        <a href="{% url 'crear_compra_tienda' %}" class="crear">Nueva Factura Tienda</a>
+
+        <table id="tabla-facturas-tienda">
+            <thead>
+                <tr>
+                    <th colspan="5" style="text-align: center; font-size: 1.2rem;background-color: #2b211b;">FACTURAS TIENDA</th>
+                </tr>
+                <tr>
+                    <th style="width: 15%;">Fecha</th>
+                    <th style="width: 25%;">Proveedor</th>
+                    <th style="width: 20%;">Total</th>
+                    <th style="width: 15%;">Pagada</th>
+                    <th style="width: 25%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factura in facturas_tienda %}
+                <tr id="factura-tienda-{{ factura.id }}">
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.fecha|date:"d/m/Y" }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.proveedor }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.total }} €</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">{{ factura.pagada|yesno:"Sí,No" }}</td>
+                    <td class="{% if factura.pagada %}fila-pagada{% endif %}">
+                        <a href="{% url 'editar_compra_tienda' factura.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_compras' %}" style="display:inline;" class="form-eliminar" data-factura-id="{{ factura.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar_factura_tienda">
+                            <input type="hidden" name="factura_id" value="{{ factura.id }}">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar esta factura?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'lista_compras' %}" style="display:inline;" class="form-marcar-pagada-tienda" data-factura-id="{{ factura.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="{% if factura.pagada %}desmarcar_pagada_tienda{% else %}marcar_pagada_tienda{% endif %}">
+                            <input type="hidden" name="factura_id" value="{{ factura.id }}">
+                            <button type="submit" class="pagada">
+                                {% if factura.pagada %}
+                                <img src="{% static 'iconos/botones/check-out.png' %}" alt="No pagada" />
+                                {% else %}
+                                <img src="{% static 'iconos/botones/check.png' %}" alt="Pagada" />
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No hay facturas disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar el cambio de estado de la factura (marcar como pagada o desmarcar)
+        $('.form-marcar-pagada').submit(function(event) {
+            debugger;
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const formData = {
+                accion: form.find('input[name="accion"]').val(),
+                factura_id: form.data('factura-id') // Asegúrate de tener esto correcto
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(formData) // Convierte el objeto a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text('No se pudo actualizar el estado de la factura.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Añadir este log para depurar el error
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+
+        // Funcionalidad para manejar el cambio de estado de la factura (marcar como pagada o desmarcar)
+        $('.form-marcar-pagada-tienda').submit(function(event) {
+            debugger;
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const formData = {
+                accion: form.find('input[name="accion"]').val(),
+                factura_id: form.data('factura-id') // Asegúrate de tener esto correcto
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(formData) // Convierte el objeto a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text('No se pudo actualizar el estado de la factura.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Añadir este log para depurar el error
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+
+        // Funcionalidad para manejar la eliminación de una factura
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const facturaId = form.data('factura-id'); // ID de la factura a eliminar
+            const formData = {
+                accion: form.find('input[name="accion"]').val(), // Acción (eliminar_factura_iva o eliminar_factura_tienda)
+                factura_id: facturaId // ID de la factura
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Especificamos que estamos enviando JSON
+                    'X-CSRFToken': '{{ csrf_token }}' // Incluir el token CSRF
+                },
+                body: JSON.stringify(formData) // Convertimos los datos a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text('No se pudo eliminar la factura.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log de error para depuración
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'home/home.html' %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles\carniceria\base_carniceria.css' %}">
+
+{% block stylesSecundary %}
+{% endblock %}
+{% endblock %}
+
+{% block header %}
+<header id="main-header">
+    <nav id="navigation">
+        <a href="{% url 'home' %}" class="nav-link">
+            <img src="{% static 'iconos/hogar.png' %}" alt="Home Icon" class="nav-icon">
+            Home
+        </a>
+        <a href="{% url 'lista_ventas' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/ventas.png' %}" alt="Ventas Icon" class="nav-icon">
+            Ventas
+        </a>
+        <a href="{% url 'lista_compras' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/compras.png' %}" alt="Compras Icon" class="nav-icon">
+            Compras
+        </a>
+        <a href="{% url 'lista_gastos_pagos_tienda' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/gastos.png' %}" alt="Gastos Icon" class="nav-icon">
+            Gastos
+        </a>
+        <a href="{% url 'lista_capital' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/capital.png' %}" alt="Capital Icon" class="nav-icon">
+            Capital
+        </a>
+        <a href="{% url 'lista_clientes' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/clientes.png' %}" alt="Clientes Icon" class="nav-icon">
+            Clientes
+        </a>
+        <a href="{% url 'lista_facturas' %}" class="nav-link">
+            <img src="{% static 'iconos/carniceria/facturas.png' %}" alt="Facturas Icon" class="nav-icon">
+            Facturación
+        </a>
+        <a href="{% url 'balance_carniceria' %}" class="nav-link">
+            <img src="{% static 'iconos/balance.png' %}" alt="Balance Icon" class="nav-icon">
+            Balance
+        </a>
+    </nav>
+</header>
+{% endblock %}
+
+<main id="main-content">
+    {% block content %}
+    {% endblock %}
+</main>
+

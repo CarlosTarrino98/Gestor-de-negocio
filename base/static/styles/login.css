@@ -1,0 +1,75 @@
+/* Estilo general para centrar el formulario */
+.generic-form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto; /* Centra el formulario horizontalmente */
+    margin-top: 20px;
+    width: 40%;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem;
+}
+
+/* Estructura de los elementos del formulario */
+.generic-form .field-container {
+    display: flex;
+    flex-direction: column; /* Label encima del input */
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+/* Estilo para los labels */
+.generic-form label {
+    color: #4b3a2f;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 5px; /* Espacio debajo del label */
+}
+
+/* Estilos para los inputs y selects */
+.generic-form input[type="text"],
+.generic-form input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;    
+    background-color: #f9f9f9;
+}
+
+p{
+    margin-top: 15px;
+}
+/* Estilos generales para botones y enlaces */
+button{
+    background-color: #4b3a2f;
+    color: white;
+    border: none;
+    padding: 12px 20px;  /* Aumenté el padding para mejorar la estética */
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: auto;
+    height: 45px;
+    line-height: 1;  /* Para asegurar que el texto esté centrado */
+    margin: auto;
+    margin-top: 20px;
+}
+
+/* Cambiar el tamaño y forma de los botones y enlaces */
+button:hover, a:hover {
+    background-color: #3e2c1c;
+    font-size: 1.1rem;
+}
+
+ul {
+    list-style-type: none;
+}

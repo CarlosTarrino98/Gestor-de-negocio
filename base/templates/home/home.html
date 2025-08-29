@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mi Aplicación de Gestión</title>
+
+        <!-- Cargar archivo CSS -->
+        {% block styles %}
+        {% endblock %}
+        <!-- Cargar archivos generales CSS -->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'styles\home.css' %}">
+        
+    </head>
+    <body>
+        {% block header %}
+            <header id="main-header">
+                <h1>Gestión de negocio - Pettisso</h1>
+            </header>
+
+            <h3 class="titulo">SECCIONES</h3>
+
+            <nav id="navbar">
+                <div class="image-container">
+                    <a href="{% url 'lista_ventas' %}" id="link-carniceria">
+                        <img src="{% static 'images/carne_cortada.jpg' %}" alt="Carnicería" id="img-carniceria">
+                        <span class="image-text">Carnicería</span>
+                    </a>
+                    <a href="{% url 'lista_pedidos' %}" id="link-asador">
+                        <img src="{% static 'images/pollo_asado.jpg' %}" alt="Asador de Pollos" id="img-asador">
+                        <span class="image-text">Asador</span>
+                    </a>
+                </div>
+            </nav>
+        {% endblock %}
+
+        <main id="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </body>
+</html>

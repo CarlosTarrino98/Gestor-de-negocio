@@ -1,0 +1,146 @@
+{% extends 'base/base_asador.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="titulo">Editar Pedido</h1>
+
+<form method="post" class="generic-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div id="container-form-secundary">
+        <div class="form-secundary">
+            <h3>Productos</h3>
+            <div id="productos-container">
+                {% for pedido_producto in pedido_productos %}
+                <div class="producto-entry">
+                    <select name="productos[{{ forloop.counter0 }}][producto]">
+                        <option value="">Seleccione un producto</option>
+                        {% for producto in productos %}
+                        <option class="categoria-{{ producto.categoria }}" value="{{ producto.id }}" {% if pedido_producto.producto.id == producto.id %}selected{% endif %}>
+                            {{ producto.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="productos[{{ forloop.counter0 }}][cantidad]" min="1" value="{{ pedido_producto.cantidad }}">
+                    <button type="button" class="remove-producto">
+                        <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-product" class="crear">Agregar Producto</button>
+        </div>
+
+        <div class="form-secundary">
+            <h3>Menús</h3>
+
+            <div id="menus-container">
+                {% for pedido_menu in pedido_menus %}
+                <div class="menu-entry">
+                    <select name="menus[{{ forloop.counter0 }}][menu]">
+                        <option value="">Seleccione un menú</option>
+                        {% for menu in menus %}
+                        <option value="{{ menu.id }}" {% if pedido_menu.menu.id == menu.id %}selected{% endif %}>
+                            {{ menu.nombre }} - {{ menu.precio }}€
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="menus[{{ forloop.counter0 }}][cantidad]" min="1" value="{{ pedido_menu.cantidad }}">
+                    <button type="button" class="remove-menu">
+                        <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-menu" class="crear">Agregar Menú</button>
+        </div>
+    </div>
+    
+    <div class="button-row">
+        <a href="{% url 'lista_pedidos' %}" class="return">Volver</a>
+        <button type="submit" class="crear">Guardar Cambios</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para agregar un nuevo producto
+        document.getElementById('add-product').addEventListener('click', function() {
+            const container = document.getElementById('productos-container');
+            const entryCount = container.getElementsByClassName('producto-entry').length; // cuenta el número actual de entradas
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('producto-entry');
+            newEntry.innerHTML = `
+                <select name="productos[${entryCount}][producto]">
+                    <option value="">Seleccione un producto</option>
+                    {% for producto in productos %}
+                        <option value="{{ producto.id }}" class="categoria-{{ producto.categoria }}">
+                            {{ producto.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="productos[${entryCount}][cantidad]" min="1" value="1">
+                <button type="button" class="remove-producto">
+                    <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                </button>
+            `;
+            container.appendChild(newEntry);
+        });
+
+        // Función para eliminar un producto
+        document.getElementById('productos-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-producto')) {
+                e.target.parentElement.remove();
+            }
+            // Reajustar los índices después de eliminar
+            const entries = container.getElementsByClassName('producto-entry');
+            for (let i = 0; i < entries.length; i++) {
+                const select = entries[i].querySelector('select');
+                const input = entries[i].querySelector('input');
+                select.name = `productos[${i}][producto]`;
+                input.name = `productos[${i}][cantidad]`;
+            }
+        });
+
+        // Función para agregar un nuevo menú
+        document.getElementById('add-menu').addEventListener('click', function() {
+            const container = document.getElementById('menus-container');
+            const entryCount = container.getElementsByClassName('menu-entry').length; // cuenta el número actual de entradas
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('menu-entry');
+            newEntry.innerHTML = `
+                <select name="menus[${entryCount}][menu]">
+                    <option value="">Seleccione un menú</option>
+                    {% for menu in menus %}
+                        <option value="{{ menu.id }}">
+                            {{ menu.nombre }} - {{ menu.precio }}€
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="menus[${entryCount}][cantidad]" min="1" value="1">
+                <button type="button" class="remove-menu">
+                    <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                </button>
+            `;
+            container.appendChild(newEntry);
+        });
+
+        // Función para eliminar un menú
+        document.getElementById('menus-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-menu')) {
+                e.target.parentElement.remove();
+            }
+            // Reajustar los índices después de eliminar
+            const entries = container.getElementsByClassName('menu-entry');
+            for (let i = 0; i < entries.length; i++) {
+                const select = entries[i].querySelector('select');
+                const input = entries[i].querySelector('input');
+                select.name = `menus[${i}][menu]`;
+                input.name = `menus[${i}][cantidad]`;
+            }
+        });
+    });
+</script>
+
+{% endblock %}

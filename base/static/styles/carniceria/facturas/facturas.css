@@ -1,0 +1,120 @@
+.factura-container {
+    font-size: 1.2rem;
+    background-color: #d6cdc04c;
+    color: #291d0d;
+    justify-content: center;
+}
+
+.factura-container h1{
+    text-align: center;
+    background-color: #1a0e06;
+    color: white;
+    margin: 0;
+    padding: 20px 0;
+}
+
+.factura-encabezado .logo img {
+    max-width: 150px;
+    height: auto;
+}
+
+.factura-encabezado {
+    display: table;
+    width: 100%;
+    background-color: #c7b59d;
+    padding: 10px 30px;
+}
+
+.info-empresa, .fechas-container, .logo {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 10px;
+    text-align: center;
+    width: 33%;
+}
+
+.info-empresa ul, .info-empresa h3 {
+    text-align: left;
+    padding-left: 0;
+    list-style: none;
+}
+
+.fechas p{
+    margin-top: 0;
+}
+
+.factura-implicados {
+    display: table;
+    width: 100%;
+    padding: 0 30px;
+    font-size: 1rem;
+}
+
+.factura-implicados ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.factura-de,
+.factura-para {
+    display: table-cell;
+    vertical-align: top;
+    padding: 10px 20px;
+}
+
+.factura-de {
+    width: 50%; /* 50% del ancho total */
+    border-right: 1px solid #c7b59d; /* Línea separadora */
+}
+
+.factura-para {
+    width: 50%;
+}
+
+.factura-de::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px; /* Grosor de la línea */
+    height: 100%; /* Ocupa toda la altura del contenedor principal */
+    background-color: #c7b59d; /* Color de la línea */
+}
+
+.factura-productos {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.factura-productos th, .factura-productos td {
+    border: 1px solid #c7b59d;
+    padding: 10px;
+    text-align: left;
+}
+
+.factura-productos th {
+    background-color: #c7b59d;
+}
+
+.factura-productos tfoot {
+    border-top: 5px solid #c7b59d;
+}
+
+.factura-productos tfoot td {
+    font-weight: bold;
+    border-collapse: collapse;
+    text-align: right; 
+}
+
+.factura-productos thead {
+    display: table-header-group;
+}
+
+.factura-productos tfoot {
+    display: table-footer-group;
+}
+
+li{
+    margin-top: 10px;
+}

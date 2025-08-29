@@ -1,0 +1,88 @@
+{% extends 'base/base_carniceria.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="titulo">Gestión de Clientes</h1>
+
+<div class="div-container">
+    <a href="{% url 'crear_cliente' %}" class="crear">Nuevo Cliente</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Código</th>
+                <th style="width: 20%;">Nombre</th>
+                <th style="width: 35%;">Dirección</th>
+                <th style="width: 15%;">CIF/DNI</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr id="cliente-{{ cliente.id }}">
+                <td>{{ cliente.codigo }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.direccion }}</td>
+                <td>{{ cliente.cif_dni }}</td>
+                <td>
+                    <a href="{% url 'editar_cliente' cliente.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_clientes' %}" style="display:inline;" class="form-eliminar" data-cliente-id="{{ cliente.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar_cliente">
+                        <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No hay clientes registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un cliente
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const clienteId = form.data('cliente-id'); // ID del cliente a eliminar
+            const formData = {
+                accion: form.find('input[name="accion"]').val(), // Acción (eliminar_cliente)
+                cliente_id: clienteId // ID del cliente
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Especificamos que estamos enviando JSON
+                    'X-CSRFToken': '{{ csrf_token }}' // Incluir el token CSRF
+                },
+                body: JSON.stringify(formData) // Convertimos los datos a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Recargar la página para ver los cambios
+                } else {
+                    $('#mensaje').text('No se pudo eliminar el cliente.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log de error para depuración
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base/base_asador.html' %}
+
+{% block content %}
+{% load static %}
+
+<h1 class="titulo">Lista de Productos</h1>
+<div class="div-container">
+    <a href="{% url 'crear_producto' %}" class="crear">Crear nuevo producto</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40%;">Nombre</th>
+                <th style="width: 30%;">Categoría</th>
+                <th style="width: 15%;">Precio (€)</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr id="producto-{{ producto.id }}">
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.categoria }}</td>
+                <td>{{ producto.precio }}</td>
+                <td>
+                    <a href="{% url 'editar_producto' producto.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_productos' %}" style="display:inline;" class="form-eliminar" data-producto-id="{{ producto.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No hay productos disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un producto
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const productoId = form.data('producto-id'); // ID del producto a eliminar
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'accion': 'eliminar',
+                    'producto_id': productoId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Eliminar la fila del producto de la tabla
+                        $(`#producto-${productoId}`).remove();
+                        location.reload();
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar el producto.').css('color', 'red');
+                    }
+                },
+                error: function() {
+                    $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

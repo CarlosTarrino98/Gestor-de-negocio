@@ -1,0 +1,168 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/carniceria/balance/balance.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="titulo">Balance de la Carnicería</h1>
+
+    <!-- Filtros de fecha -->
+    <form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'balance_carniceria' %}">
+        <div class="fecha-fila">
+            <div class="filtro-item">
+                <label for="fechaInicio">Desde:</label>
+                <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+            </div>
+
+            <div class="filtro-item">
+                <label for="fechaFin">Hasta:</label>
+                <input type="date" id="fechaFin" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+            </div>
+        </div>
+
+        <div class="boton-container">
+            <button type="submit">Filtrar</button>
+        </div>
+    </form>
+
+    <div class="graficos-container">
+        <!-- Gráfico de barras Totales Generales y Beneficios -->
+        <div class="grafico" id="grafico1" style="background-color: #f7e0c3c3; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <h3>Totales Generales y Beneficios</h3>
+            <canvas id="graficoTotalesBeneficios"></canvas>
+        </div>
+            
+        <div class="grafico" style="background-color: #fff; padding: 20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center; font-size: 1.8rem; background-color: #2b211b;">Totales Generales y Beneficios</th>
+                    </tr>
+                    <tr>
+                        <th style="width: 65%;">Descripción</th>
+                        <th style="width: 35%;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ventas</td>
+                        <td>{{ ventas }}</td>
+                    </tr>
+                    <tr>
+                        <td>Compras</td>
+                        <td>{{ compras }}</td>
+                    </tr>
+                    <tr>
+                        <td>Gastos</td>
+                        <td>{{ gastos }}</td>
+                    </tr>
+                    <tr>
+                        <td>Beneficios</td>
+                        <td>{{ beneficios }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Asignar los datos del contexto de Django a variables JavaScript
+        const totalVentas = Number("{{ ventas|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalCompras = Number("{{ compras|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalGastos = Number("{{ gastos|floatformat:2|default:'0.00' }}".replace(',', '.'));
+        const totalBeneficios = Number("{{ beneficios|floatformat:2|default:'0.00' }}".replace(',', '.'));
+
+        // Gráfico de Totales Generales y Beneficios
+        const ctxTotalesBeneficios = document.getElementById('graficoTotalesBeneficios').getContext('2d');
+        const graficoTotalesBeneficios = new Chart(ctxTotalesBeneficios, {
+            type: 'bar',
+            data: {
+                labels: ['Ventas', 'Compras', 'Gastos', 'Beneficios'],
+                datasets: [{
+                    data: [totalVentas, totalCompras, totalGastos, totalBeneficios],
+                    backgroundColor: [
+                        'rgba(0, 51, 102, 0.6)',   // Azul elegante para Ventas
+                        'rgba(255, 215, 0, 0.6)',  // Dorado para Compras
+                        'rgba(255, 0, 0, 0.6)',     // Color rojo para gastos
+                        'rgba(0, 128, 0, 0.6)'      // Color verde para beneficios
+                    ],
+                    borderColor: [
+                        'rgba(0, 51, 102, 1)',   // Azul elegante para Ventas
+                        'rgba(255, 215, 0, 1)',  // Dorado para Compras
+                        'rgba(255, 0, 0, 1)',     // Color rojo para gastos
+                        'rgba(0, 128, 0, 1)'      
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // No mostrar la leyenda
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const total = totalVentas + totalCompras + totalGastos;
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(2);
+                                return `${value}€ - (${percentage}%)`;
+                            },
+                            labelTextColor: function() {
+                                return 'rgba(255, 255, 255, 1)';
+                            }
+                        },
+                        titleFont: {
+                            size: 24,
+                            weight: 'bold',
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        bodyFont: {
+                            size: 20,
+                            family: 'Arial',
+                            color: 'rgba(255, 255, 255, 1)'
+                        },
+                        displayColors: false,
+                        backgroundColor: '#1a0e06',
+                        borderColor: '#1a0e06',
+                        borderWidth: 1,
+                        xPadding: 10,
+                        yPadding: 10
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                family: 'Arial',
+                                size: 22,
+                                weight: 'bold',
+                                color: 'rgba(0, 0, 0, 1)'
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                family: 'Arial',
+                                size: 22,
+                                weight: 'bold',
+                                color: 'rgba(0, 0, 0, 1)'
+                            }
+                        }
+                    }
+                }
+            }
+        });        
+    </script>
+    {% endblock %}

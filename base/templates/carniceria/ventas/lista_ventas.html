@@ -1,0 +1,113 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">Lista de Ventas</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_ventas' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<!-- Botón para agregar una nueva venta -->
+<div class="div-container">
+    <a href="{% url 'crear_venta' %}" class="crear">Agregar Nueva Venta</a>
+
+    <!-- Tabla de ventas -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Fecha</th>
+                <th style="width: 20%;">Total (€)</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr id="venta-{{ venta.id }}">
+                <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+                <td>{{ venta.total }}</td>
+                <td>
+                    <a href="{% url 'editar_venta' venta.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar">
+                    </a>
+                    <form method="post" action="{% url 'lista_ventas' %}" style="display:inline;" class="form-eliminar" data-venta-id="{{ venta.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar_venta">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar esta venta?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar">
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center;">No hay ventas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<span id="mensaje"></span> <!-- Mensajes de retroalimentación -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Manejar la eliminación de una venta con AJAX
+        $('.form-eliminar').submit(function (event) {
+            debugger;
+            event.preventDefault(); 
+
+            const form = $(this);
+            const url = form.attr('action'); 
+            const ventaId = form.data('venta-id'); 
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: "application/json",
+                headers: { "X-CSRFToken": csrftoken },
+                data: JSON.stringify({             // Convertir a JSON correctamente
+                    'accion': 'eliminar_venta',
+                    'registro_id': ventaId
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        $(`#venta-${ventaId}`).remove();
+                        location.reload();
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar la venta.').css('color', 'red');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    console.error("Status:", status);
+                    console.error("Response:", xhr.responseText);
+                    $('#mensaje').text('Error al procesar la solicitud. Revisa la consola.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

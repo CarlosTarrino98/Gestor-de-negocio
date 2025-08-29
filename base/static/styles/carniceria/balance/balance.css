@@ -1,0 +1,44 @@
+/* Contenedor principal de los gráficos */
+.graficos-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2%; /* Espacio más grande entre los gráficos */
+    margin-top: 20px; /* Espacio superior */
+}
+
+/* Contenedor para cada gráfico */
+.grafico {
+    width: 45%; /* Incrementar el tamaño de cada gráfico */
+    max-width: 45%; /* Limitar el tamaño máximo */
+    height: auto; /* Ajustar la altura automáticamente */
+    border-radius: 10px; /* Bordes redondeados */
+    box-sizing: border-box; /* Asegura que el padding se incluya en el tamaño total */
+    display: flex;
+    flex-direction: column; /* Asegura que el título esté arriba del gráfico */
+    align-items: center; /* Centra horizontalmente el contenido dentro del contenedor */
+    justify-content: flex-start; /* Centra verticalmente el contenido */
+}
+
+/* Estilo para el canvas */
+.grafico canvas {
+    padding: 20px;
+    width: 100% !important; /* Ajusta al 100% del contenedor */
+    height: auto !important; /* El gráfico ocupará todo el ancho disponible */
+    max-width: 100%; /* Asegúrate de que el gráfico no se estire más de lo necesario */
+}
+
+/* Estilo para el título */
+.grafico h3 {
+    width: 100%;
+    font-size: 2rem; /* Ajusta el tamaño del texto */
+    background-color: #3e2c1c;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    padding: 20px; /* Elimina el padding para ajustarse mejor */
+    flex-shrink: 0; /* Asegura que el título no se reduzca */
+}
+
+

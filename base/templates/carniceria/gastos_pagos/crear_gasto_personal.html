@@ -1,0 +1,16 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block content %}
+<h1 class="titulo">Crear Gasto Personal</h1>
+
+<form method="post" class="generic-form">
+    {% csrf_token %}
+    {{ form.as_p }} <!-- Aquí se renderiza el formulario de edición -->
+    
+    <div class="button-row">
+        <a href="{% url 'lista_gastos_pagos_tienda' %}" class="return">Volver</a> <!-- Enlace para volver a la lista -->
+        <button type="submit" class="crear">Guardar</button> <!-- Botón para guardar los cambios -->
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/carniceria/lista_gastos_pagos/lista_gastos_pagos.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">LISTA DE GASTOS Y PAGOS</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_gastos_pagos_tienda' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<div class="informacion">
+    <!-- Columna 1: Tabla de Gastos Tienda -->
+    <div class="columna">
+        <a href="{% url 'crear_gasto_tienda' %}" class="crear">Nuevo Gasto Tienda</a>
+
+        <table id="tabla-gastos-tienda">
+            <thead>
+                <tr>
+                    <th colspan="4" style="text-align: center; font-size: 1.2rem;background-color: #2b211b;">GASTOS TIENDA</th>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 35%;">Descripción</th>
+                    <th style="width: 20%;">Total (€)</th>
+                    <th style="width: 25%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gasto_tienda in gastos_tienda %}
+                <tr id="gasto-tienda-{{ gasto_tienda.id }}">
+                    <td>{{ gasto_tienda.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ gasto_tienda.gasto }}</td>
+                    <td>{{ gasto_tienda.total }} €</td>
+                    <td>
+                        <a href="{% url 'editar_gasto_tienda' gasto_tienda.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_gastos_pagos_tienda' %}" style="display:inline;" class="form-eliminar" data-gasto-pago-id="{{ gasto_tienda.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar_gasto">
+                            <input type="hidden" name="gasto-pago-id" value="{{ gasto_tienda.id }}">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este gasto?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No hay gastos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Columna 2: Tabla de Pagos Banco -->
+    <div class="columna">
+        <a href="{% url 'crear_pago_banco' %}" class="crear">Nuevo Pago Banco</a>
+
+        <table id="tabla-pagos-banco">
+            <thead>
+                <tr>
+                    <th colspan="4" style="text-align: center; font-size: 1.2rem;background-color: #2b211b;">PAGOS BANCO</th>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 35%;">Concepto</th>
+                    <th style="width: 20%;">Total (€)</th>
+                    <th style="width: 25%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago_banco in pagos_banco %}
+                <tr id="pago-banco-{{ pago_banco.id }}">
+                    <td>{{ pago_banco.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ pago_banco.concepto }}</td>
+                    <td>{{ pago_banco.total }} €</td>
+                    <td>
+                        <a href="{% url 'editar_pago_banco' pago_banco.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_gastos_pagos_tienda' %}" style="display:inline;" class="form-eliminar" data-gasto-pago-id="{{ pago_banco.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar_pago">
+                            <input type="hidden" name="gasto-pago-id" value="{{ pago_banco.id }}">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este pago?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No hay pagos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Columna 3: Tabla de Gastos Personales -->
+    <div class="columna">
+        <a href="{% url 'crear_gasto_personal' %}" class="crear">Nuevo Gasto Personal</a>
+        <table id="tabla-gastos-personales">
+            <thead>
+                <tr>
+                    <th colspan="4" style="text-align: center; font-size: 1.2rem;background-color: #2b211b;">GASTOS PERSONALES</th>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 40%;">Descripción</th>
+                    <th style="width: 25%;">Total (€)</th>
+                    <th style="width: 25%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gasto_personal in gastos_personales %}
+                <tr id="gasto-personal-{{ gasto_personal.id }}">
+                    <td>{{ gasto_personal.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ gasto_personal.gasto }}</td>
+                    <td>{{ gasto_personal.total }} €</td>
+                    <td>
+                        <a href="{% url 'editar_gasto_personal' gasto_personal.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_gastos_pagos_tienda' %}" style="display:inline;" class="form-eliminar" data-gasto-pago-id="{{ gasto_personal.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar_gasto_personal">
+                            <input type="hidden" name="gasto-pago-id" value="{{ gasto_personal.id }}">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este gasto personal?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No hay gastos personales registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un gasto
+        $('.form-eliminar').submit(function(event) {
+            debugger;
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const gastoId = form.data('gasto-pago-id'); // ID del gasto a eliminar
+            const formData = {
+                accion: form.find('input[name="accion"]').val(), // Acción (eliminar_gasto)
+                registro_id: gastoId // ID del gasto
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Especificamos que estamos enviando JSON
+                    'X-CSRFToken': '{{ csrf_token }}' // Incluir el token CSRF
+                },
+                body: JSON.stringify(formData) // Convertimos los datos a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Recargar la página para ver los cambios
+                } else {
+                    $('#mensaje').text('No se pudo eliminar el gasto.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log de error para depuración
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+    });
+</script>
+{% endblock %}

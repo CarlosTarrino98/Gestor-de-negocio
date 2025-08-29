@@ -1,0 +1,162 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">CAPITAL</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_capital' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<div class="div-container">
+    <a href="{% url 'crear_capital' %}" class="crear">Nuevo Capital</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Fecha</th>
+                <th style="width: 35%;">Tipo de Ingreso</th>
+                <th style="width: 30%;">Total</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for capital in capitales %}
+            <tr id="capital-{{ capital.id }}">
+                <td>{{ capital.fecha|date:"d/m/Y" }}</td>
+                <td>{{ capital.get_tipo_ingreso_display }}</td>
+                <td>{{ capital.total }} €</td>
+                <td>
+                    <a href="{% url 'editar_capital' capital.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_capital' %}" style="display:inline;" class="form-eliminar" data-capital-id="{{ capital.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar_capital">
+                        <input type="hidden" name="capital_id" value="{{ capital.id }}">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este capital?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No hay capital disponible.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Fila para mostrar los totales de capitales -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 55%;">Descripción</th>
+                <th style="width: 45%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Total de Capital:</td>
+                <td>{{ total_capitales }} €</td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Fecha</th>
+                <th style="width: 35%;">Tipo de Ingreso</th>
+                <th style="width: 30%;">Total</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tarjeta in tarjetas %}
+            <tr id="capital-{{ tarjeta.id }}">
+                <td>{{ tarjeta.fecha|date:"d/m/Y" }}</td>
+                <td>{{ tarjeta.get_tipo_ingreso_display }}</td>
+                <td>{{ tarjeta.total }} €</td>
+                <td>
+                    <a href="{% url 'editar_capital' tarjeta.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_capital' %}" style="display:inline;" class="form-eliminar" data-capital-id="{{ tarjeta.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar_capital">
+                        <input type="hidden" name="capital_id" value="{{ tarjeta.id }}">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este capital?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No hay capital disponible.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un capital
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const capitalId = form.data('capital-id'); // ID del capital a eliminar
+            const formData = {
+                accion: form.find('input[name="accion"]').val(), // Acción (eliminar_capital)
+                capital_id: capitalId // ID del capital
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Especificamos que estamos enviando JSON
+                    'X-CSRFToken': '{{ csrf_token }}' // Incluir el token CSRF
+                },
+                body: JSON.stringify(formData) // Convertimos los datos a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text('No se pudo eliminar el capital.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Log de error para depuración
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+    });
+</script>
+{% endblock %}

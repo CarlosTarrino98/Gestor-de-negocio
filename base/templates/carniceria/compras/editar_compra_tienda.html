@@ -1,0 +1,16 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block content %}
+<h1 class="titulo">Editar Factura de Tienda</h1>
+
+<form method="post" class="generic-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <div class="button-row">
+        <a href="{% url 'lista_compras' %}" class="return">Volver</a>
+        <button type="submit" class="crear">Guardar</button>
+    </div>
+</form>
+
+{% endblock %}

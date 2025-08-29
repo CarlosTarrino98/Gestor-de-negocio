@@ -1,0 +1,279 @@
+{% extends 'base/base_asador.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles\asador\pedidos\lista_pedidos.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">LISTA DE PEDIDOS</h1>
+
+<!-- Formulario para filtrar por fecha -->
+<div class="filtro-fecha">
+    <form method="get" action="{% url 'lista_pedidos' %}">
+        <input type="date" name="fecha" value="{{ fecha }}">
+        <button type="submit">Filtrar</button>
+    </form>
+</div>
+
+<div class="informacion">
+
+    <!-- Columna 1: Tabla de intervalos y recuentos -->
+    <div class="columna">
+        <!-- Recuento de Pollos Asados y Cachopos -->
+        <h3>Pollos Asados</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Disponibles</th>
+                    <th>Encargados</th>
+                    <th>Restantes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ inventario_pollos.cantidad_disponible }}</td>
+                    <td>{{ total_pollos }}</td>
+                    <td>{{ pollos_restantes }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <h3>Cachopos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ternera</th>
+                    <th>Pollo</th>
+                    <th>Lomo</th>
+                    <th>Degustación</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ total_cachopos_ternera }}</td>
+                    <td>{{ total_cachopos_pollo }}</td>
+                    <td>{{ total_cachopos_lomo }}</td>
+                    <td>{{ total_cachopos_degustacion }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <!-- Recuento de Intervalos Horarios -->
+        <h3>Control de Horas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Intervalo</th>
+                    <th style="width: 40%;">Pedidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for intervalo, cantidad in conteo_pedidos_por_intervalo.items %}
+                    <tr>
+                        <td>{{ intervalo.0 }} - {{ intervalo.1 }}</td>
+                        <td>{{ cantidad }} </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Columna 2: Tabla de Pedidos -->
+    <div class="columna">
+        <!-- enlace creación de pedido -->
+        <a href="{% url 'crear_pedido' %}" class="crear">Nuevo pedido</a>
+
+        <!-- Botón de Cierre del Día -->
+        <button id="btn-cierre-dia" class="eliminar">Cierre de día</button>
+
+        <span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+        <table id="tabla-pedidos">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Nombre</th>
+                    <th style="width: 5%;">Hora</th>
+                    <th style="width: 35%;">Detalles del Pedido</th>
+                    <th style="width: 25%;">Observaciones</th>
+                    <th style="width: 10%;">Precio Total</th>
+                    <th style="width: 15%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr id="pedido-{{ pedido.id }}">
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">{{ pedido.nombre_cliente }}</td>
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">{{ pedido.fecha_hora|date:"H:i" | upper }}</td>
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">
+                        <div class="detalle">
+                            <ul>
+                                {% for detalle in pedido.detalles %}
+                                    <li>{{ detalle.cantidad }} x {{ detalle.nombre }} - {{ detalle.precio }}€</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">{{ pedido.observaciones }} </td>
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">{{ pedido.total_precio }} €</td>
+                    <td class="{% if pedido.entregado %}fila-entregado{% endif %}">
+                        <a href="{% url 'editar_pedido' pedido.id %}" class="editar">
+                            <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                        </a>
+                        <form method="post" action="{% url 'lista_pedidos' %}" style="display:inline;" class="form-eliminar" data-pedido-id="{{ pedido.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="accion" value="eliminar">
+                            <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este pedido?');">
+                                <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'lista_pedidos' %}" style="display:inline;" class="form-entregar" data-pedido-id="{{ pedido.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+                            <input type="hidden" name="accion" value="{% if pedido.entregado %}desmarcar_entregado{% else %}marcar_entregado{% endif %}">
+                            <button type="submit" class="entregado">
+                                {% if pedido.entregado %}
+                                    <img src="{% static 'iconos/botones/check-out.png' %}" alt="Desmarcar" />
+                                {% else %}
+                                    <img src="{% static 'iconos/botones/check.png' %}" alt="Marcar" />
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">No hay pedidos disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar el cambio de estado de un pedido
+        $('.form-entregar').submit(function(event) {
+            event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const formData = {
+                accion: form.find('input[name="accion"]').val(),
+                pedido_id: form.data('pedido-id') // Asegúrate de tener esto correcto
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(formData) // Convierte el objeto a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text('No se pudo actualizar el estado de entrega.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Añadir este log para depurar el error
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+
+        // Funcionalidad para manejar la eliminación de un pedido
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const pedidoId = form.data('pedido-id'); // ID del pedido a eliminar
+            const formData = {
+                accion: 'eliminar', // Acción a realizar
+                pedido_id: pedidoId // ID del pedido
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Especificamos que estamos enviando JSON
+                    'X-CSRFToken': '{{ csrf_token }}' // Incluir el token CSRF
+                },
+                body: JSON.stringify(formData) // Convertimos los datos a JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    $('#mensaje').text(data.message || 'No se pudo eliminar el pedido.').css('color', 'red');
+                }
+            })
+            .catch(error => {
+                $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+            });
+        });
+
+    });
+
+    // Funcionalidad para manejar el cierre del día
+    document.getElementById('btn-cierre-dia').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    const confirmacion = confirm('¿Estás seguro de que deseas realizar el cierre del día? Esta acción no se puede deshacer.');
+    
+    if (confirmacion) {
+        // Obtener los datos que están en la página
+        const fecha = "{{ fecha }}";
+        const numeroPedidos = "{{ pedidos|length }}";  // Total de pedidos
+        const totalPollos = "{{ total_pollos }}";  // Total de pollos encargados
+        const totalCachopos = parseInt("{{ total_cachopos_ternera }}") + parseInt("{{ total_cachopos_pollo }}") + parseInt("{{ total_cachopos_lomo }}");
+        const totalVentas = "{{ total_ventas }}";  // Supongamos que has pasado el total de ventas al contexto
+        debugger;
+        // Función para realizar el cierre de día
+        const realizarCierreDia = (overwrite) => {
+            fetch("{% url 'lista_pedidos' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    accion: 'cierre_dia',
+                    fecha: fecha,
+                    numero_pedidos: parseInt(numeroPedidos),
+                    total_pollos: parseFloat(totalPollos.replace(',', '.')),
+                    total_cachopos: parseInt(totalCachopos),
+                    totalVentas: parseInt(totalVentas),
+                    overwrite: overwrite
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#mensaje').text(data.message || 'No se pudo realizar el cierre del día.').css('color', data.success ? 'green' : 'red');
+                if (data.success) {
+                } else if (data.message === 'Ya existe un resumen para la fecha señalada') {
+                    const overwrite = confirm('Ya existe un resumen para esta fecha. ¿Deseas sobreescribirlo?');
+                    if (overwrite) {
+                        realizarCierreDia(true); // Llama a la función nuevamente con overwrite = true
+                    }
+                }
+            })
+            .catch(error => {
+                $('#mensaje').text('Ocurrió un error al realizar el cierre del día.').css('color', 'red');
+            });
+        };
+
+        // Llamar a la función para realizar el cierre
+        realizarCierreDia(false);
+        }
+    });
+</script>
+
+{% endblock %}

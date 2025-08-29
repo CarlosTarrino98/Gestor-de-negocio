@@ -1,0 +1,84 @@
+{% extends 'base/base_carniceria.html' %}
+
+{% block content %}
+<h1 class="titulo">Crear Factura</h1>
+
+<form method="post" class="generic-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div id="container-form-secundary">
+        <div class="form-secundary">
+            <h3>Productos</h3>
+            <div id="productos-container">
+                {{ productos.management_form }}
+                {% for form in productos %}
+                    <div class="producto-entry">
+                        {{ form.id }}
+                        <input type="text" name="{{ form.prefix }}-descripcion" value="{{ form.initial.descripcion }}" placeholder="Descripción" class="form-control" maxlength="255">
+                        <input type="number" name="{{ form.prefix }}-cantidad" value="{{ form.initial.cantidad }}" placeholder="Cantidad (kg)" class="form-control" step="0.001">
+                        <input type="number" name="{{ form.prefix }}-precio_kg" value="{{ form.initial.precio_kg }}" placeholder="Precio por kg (€)" class="form-control" step="0.01">
+                        <button type="button" class="remove-producto">Eliminar</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-product" class="crear">Agregar Producto</button>
+        </div>
+    </div>
+    <div class="button-row">
+        <a href="{% url 'lista_facturas' %}" class="return">Volver</a>
+        <button type="submit" class="crear">Guardar</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('add-product').addEventListener('click', function() {
+            const container = document.getElementById('productos-container');
+            const entryCount = container.getElementsByClassName('producto-entry').length;
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('producto-entry');
+            newEntry.innerHTML = `
+                <input type="text" name="facturaproducto_set-${entryCount}-descripcion" placeholder="Descripción" class="form-control" maxlength="255">
+                <input type="number" name="facturaproducto_set-${entryCount}-cantidad" placeholder="Cantidad (kg)" class="form-control" step="0.001">
+                <input type="number" name="facturaproducto_set-${entryCount}-precio_kg" placeholder="Precio por kg (€)" class="form-control" step="0.01">
+                <button type="button" class="remove-producto">Eliminar</button>
+                <input type="hidden" name="facturaproducto_set-${entryCount}-id" id="id_facturaproducto_set-${entryCount}-id">
+            `;
+            container.appendChild(newEntry);
+
+            // Actualizar total forms en management form
+            document.getElementById('id_facturaproducto_set-TOTAL_FORMS').value = entryCount + 1;
+        });
+
+        // Función para eliminar un producto
+        document.getElementById('productos-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-producto')) {
+                const entry = e.target.closest('.producto-entry');
+                entry.remove();
+
+                // Reajustar los índices después de eliminar
+                const entries = document.getElementsByClassName('producto-entry');
+                for (let i = 0; i < entries.length; i++) {
+                    const inputs = entries[i].getElementsByTagName('input');
+                    for (let input of inputs) {
+                        const name = input.getAttribute('name');
+                        const id = input.getAttribute('id');
+
+                        if (name) {
+                            input.setAttribute('name', name.replace(/facturaproducto_set-\d+-/, `facturaproducto_set-${i}-`));
+                        }
+                        if (id) {
+                            input.setAttribute('id', id.replace(/id_facturaproducto_set-\d+-/, `id_facturaproducto_set-${i}-`));
+                        }
+                    }
+                }
+
+                // Actualizar total forms en management form
+                document.getElementById('id_facturaproducto_set-TOTAL_FORMS').value = entries.length;
+            }
+        });
+    });
+</script>
+
+{% endblock %}

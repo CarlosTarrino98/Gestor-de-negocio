@@ -1,0 +1,108 @@
+{% extends 'base/base_asador.html' %}
+
+{% block stylesSecundary %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'styles/asador/gastos/lista_gastos.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="titulo">Lista de Gastos</h1>
+
+<!-- Filtros de fecha -->
+<form id="filtrosFecha" class="filtro-fecha" method="GET" action="{% url 'lista_gastos' %}">
+    <div class="fecha-fila">
+        <div class="filtro-item">
+            <label for="fechaInicio">Desde:</label>
+            <input type="date" id="fechaInicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+
+        <div class="filtro-item">
+            <label for="fechaFin">Hasta:</label>
+            <input type="date" id="fechaFin" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+    </div>
+
+    <div class="boton-container">
+        <button type="submit">Filtrar</button>
+    </div>
+</form>
+
+<div class="div-container">
+    <a href="{% url 'crear_gasto' %}" class="crear">Agregar Nuevo Gasto</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 55%;">Descripción</th>
+                <th style="width: 15%;">Total (€)</th>
+                <th style="width: 15%;">Fecha</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gasto in gastos %}
+            <tr id="gasto-{{ gasto.id }}">
+                <td>{{ gasto.descripcion }}</td>
+                <td>{{ gasto.monto }}</td>
+                <td>{{ gasto.fecha|date:"d/m/Y" }}</td> 
+                <td>
+                    <a href="{% url 'editar_gasto' gasto.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_gastos' %}" style="display:inline;" class="form-eliminar" data-gasto-id="{{ gasto.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este gasto?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center;">No hay gastos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un gasto
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const gastoId = form.data('gasto-id'); // ID del gasto a eliminar
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'accion': 'eliminar',
+                    'gasto_id': gastoId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Eliminar la fila del gasto de la tabla
+                        $(`#gasto-${gastoId}`).remove();
+                        location.reload();
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar el gasto.').css('color', 'red');
+                    }
+                },
+                error: function() {
+                    $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+<!-- inventario/lista_inventario.html -->
+{% extends 'base/base_asador.html' %}
+
+{% block content %}
+{% load static %}
+
+<h1 class="titulo">Lista de Inventarios</h1>
+
+<div class="div-container">
+    <a href="{% url 'crear_inventario' %}" class="crear">Agregar Nuevo Inventario</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50%;">Producto</th>
+                <th style="width: 35%;">Cantidad Disponible</th>
+                <th style="width: 15%;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inventario in inventarios %}
+            <tr id="inventario-{{ inventario.id }}">
+                <td>{{ inventario.producto.nombre }}</td> <!-- Asegúrate de que tu modelo de Inventario tenga relación con Producto -->
+                <td>{{ inventario.cantidad_disponible }}</td>
+                <td>
+                    <a href="{% url 'editar_inventario' inventario.id %}" class="editar">
+                        <img src="{% static 'iconos/botones/editar.png' %}" alt="Editar" />
+                    </a>
+                    <form method="post" action="{% url 'lista_inventario' %}" style="display:inline;" class="form-eliminar" data-inventario-id="{{ inventario.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="eliminar">
+                        <button type="submit" class="eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este inventario?');">
+                            <img src="{% static 'iconos/botones/eliminar.png' %}" alt="Eliminar" />
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No hay inventarios registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<span id="mensaje"></span> <!-- Para mostrar mensajes de respuesta -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funcionalidad para manejar la eliminación de un inventario
+        $('.form-eliminar').submit(function(event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            const form = $(this);
+            const url = form.attr('action'); // URL de envío
+            const inventarioId = form.data('inventario-id'); // ID del inventario a eliminar
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'accion': 'eliminar',
+                    'inventario_id': inventarioId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Eliminar la fila del inventario de la tabla
+                        $(`#inventario-${inventarioId}`).remove();
+                        location.reload(); // Recargar la página para actualizar los datos
+                    } else {
+                        $('#mensaje').text(response.message || 'No se pudo eliminar el inventario.').css('color', 'red');
+                    }
+                },
+                error: function() {
+                    $('#mensaje').text('Error al procesar la solicitud.').css('color', 'red');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+/* Estilo para el formulario de filtro de fecha */
+.filtro-fecha {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filtro-fecha input[type="date"],
+.filtro-fecha button {
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+
+.filtro-fecha input[type="date"] {
+    width: 180px; /* Ajusta el ancho para que coincida con el botón */
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
+}
+
+.filtro-fecha button {
+    background-color: #4b3a2f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 180px;
+}
+
+.filtro-fecha button:hover {
+    background-color: #3e2c1c;
+    font-size: 1.3rem;
+}
+
+.informacion {
+    display: flex;
+    gap: 20px;
+}
+
+/* Columna 1: 20% del ancho */
+.columna:first-child {
+    flex: 0 0 20%; /* 20% del ancho */
+}
+
+/* Columna 2: el resto del espacio */
+.columna:last-child {
+    flex: 1; /* Resto del espacio disponible */
+}
+
+/* Estilo para cada columna */
+.columna {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos dentro de las columnas */
+.columna h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #4b3a2f;
+}
+
+/* Estilo para las listas de recuento de pollos y cachopos */
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    padding-bottom: 2px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+td button.entregado {
+    background-color: #eeac61;
+}
+
+td button.entregado:hover {
+    background-color: #eca34e;
+}
+
+/* Estilo para filas de pedidos entregados */
+.fila-entregado {
+    background-color: #b5e365d7; /* Rojo claro */
+}
+
+/* Estilo para los mensajes */
+#mensaje {
+    display: block;
+    margin-top: 20px;
+    color: green;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
