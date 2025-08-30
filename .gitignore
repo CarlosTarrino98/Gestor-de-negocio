@@ -1,0 +1,31 @@
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.swp
+*.log
+
+# Archivos de entorno
+.env
+*.env
+
+# Base de datos local de Django
+db.sqlite3
+
+# Archivos de migración de Django (si quieres ignorarlos)
+# migrations/
+
+# Archivos de IDEs (PyCharm, VSCode, etc.)
+.vscode/
+.idea/
+
+# Archivos de distribución/compilación
+*.egg-info/
+*.egg
+build/
+dist/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
