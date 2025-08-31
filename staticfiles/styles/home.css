@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f0e8d1, #e0e0e0, #f0e8d1); /* Gradiente suave en grises claros */
+    color: #2d231d;
+    line-height: 1.6;
+}
+
+#main-header {
+    background: linear-gradient(#1a0e06, #16100a , #1f160d, #1f160d, #16100a, #1a0e06); /* Gradiente de negro y marrón */
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    border-top: 2px solid #1a0e06;
+    border-bottom: 2px solid #1a0e06;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra de texto para mejorar legibilidad */
+}
+
+#main-header h1 {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.titulo {
+    font-weight: 700; /* Incrementa el grosor */
+    font-size: 3.5rem; /* Aumenta el tamaño */
+    margin: 40px;
+    color: #4b3a2f; /* Color base */
+    text-align: center;
+    text-transform: uppercase; /* Mayúsculas para mayor impacto */
+    letter-spacing: 1px; /* Espaciado entre letras */
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2), 
+                 0px 4px 6px rgba(75, 58, 47, 0.2); /* Sombra para resaltar */
+    border-bottom: 2px solid rgba(75, 58, 47, 0.3); /* Línea inferior */
+    padding-bottom: 10px; /* Espacio entre el texto y la línea */
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    gap: 5%; /* Espacio entre imágenes */
+    margin-top: 20px;
+}
+
+.image-container a {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.image-container img {
+    width: 300px;
+    height: 250px;
+    max-width: 100%;
+    object-fit: cover;
+    border: 2px solid #1a0e06d1;
+    border-radius: 5%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-container img:hover {
+    transform: scale(1.10);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.image-text {
+    color: #1a0e06ce;
+    margin-top: 30px;
+    font-size: 2rem;
+    font-weight: 600;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.logout-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.logout-btn img {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.logout-btn img:hover {
+    transform: scale(1.1);
+}

@@ -1,0 +1,44 @@
+.informacion {
+    display: flex;
+    gap: 20px;
+}
+
+/* Columna 1: 20% del ancho */
+.columna:first-child {
+    flex: 0 0 55%; 
+}
+
+/* Columna 2: el resto del espacio */
+.columna:last-child {
+    flex: 1; /* Resto del espacio disponible */
+}
+
+/* Estilo para cada columna */
+.columna {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+td button.pagada {
+    background-color: #eeac61;
+}
+
+td button.pagada:hover {
+    background-color: #eca34e;
+}
+
+/* Estilo para filas de facturas pagadas */
+.fila-pagada {
+    background-color: #a3ed67; /* Rojo claro */
+}
+
+/* Estilo para los mensajes */
+#mensaje {
+    display: block;
+    margin-top: 20px;
+    color: green;
+    font-size: 1.2rem;
+    font-weight: 600;
+}

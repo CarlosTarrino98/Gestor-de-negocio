@@ -1,0 +1,305 @@
+/* Estilo para el header y nav */
+#main-header {
+    margin: 0;
+    height: 100px; /* Ajusta la altura del header según tus necesidades */
+}
+
+#navigation {
+    display: flex; /* Los elementos estarán en fila */
+    height: 100%; /* El nav ocupará todo el alto del header */
+    padding: 0; /* Sin padding */
+    margin: 0; /* Sin margen */
+}
+
+/* Estilo para los enlaces */
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column; /* Icono arriba, texto abajo */
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Ocupa todo el alto del nav */
+    width: 100%; /* Ocupa todo el ancho del espacio disponible */
+    background-color: transparent; /* Sin color de fondo */
+    padding: 0; /* Sin padding */
+    margin: 0; /* Sin margen */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Cambia el color de fondo al pasar el ratón */
+.nav-link:hover {
+    background-color: #3e2c1c; /* Fondo más oscuro en hover */
+    color: #e2ae6a; /* Color dorado para el texto en hover */
+}
+
+/* Estilo para los iconos */
+.nav-link i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+/* Estilo para los iconos */
+.nav-link img {
+    width: 28px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+main {
+    margin: 20px;
+    transform: scale(0.9); /* Reduce el tamaño al 80% */
+    transform-origin: top left; /* Escala desde la esquina superior izquierda */
+    width: 108%; /* Asegura que no haya desplazamiento horizontal */
+    overflow: hidden; /* Evita que aparezcan barras de desplazamiento innecesarias */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: top; /* Centra el contenido verticalmente */
+}
+
+/**************************** TABLE *****************************************/
+
+/* Estilos para las tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #4b3a2f;
+    color: white;
+    font-weight: 600;
+}
+
+td {
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Estilos generales para botones y enlaces */
+button, a {
+    background-color: #4b3a2f;
+    color: white;
+    border: none;
+    padding: 12px 20px;  /* Aumenté el padding para mejorar la estética */
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;  /* Eliminar subrayado en los enlaces */
+    height: 45px;
+    line-height: 1;  /* Para asegurar que el texto esté centrado */
+}
+
+/* Cambiar el tamaño y forma de los botones y enlaces */
+button:hover, a:hover {
+    background-color: #3e2c1c;
+    font-size: 1.3rem;
+}
+
+/* Botón verde para crear */
+.crear {
+    background-color: #6dbf6e;
+    color: white;
+}
+
+.crear:hover {
+    background-color: #5aa75b;
+}
+
+/* Botón rojo para eliminar (incluyendo cierre de día) */
+.eliminar {
+    background-color: #ff6f61;
+    color: white;
+}
+
+.eliminar:hover {
+    background-color: #e55c50;
+}
+
+/* Estilo para los botones de acción dentro de las tablas */
+td button, td a {
+    border-radius: 5px;
+    padding: 6px 10px; /* Reduce el tamaño del padding */
+    font-size: 0.9rem; /* Disminuye el tamaño de la fuente */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Cambiar el tamaño y forma de los botones y enlaces */
+td button:hover, td a:hover {
+    background-color: #3e2c1c;
+    font-size: 1rem;
+}
+
+td a.editar {
+    background-color: #6dbf6e;
+}
+
+td a.editar:hover {
+    background-color: #5aa75b;
+}
+
+td button.eliminar, .remove-producto, .remove-menu {
+    background-color: #ff6f61;
+}
+
+td button.eliminar:hover {
+    background-color: #e55c50;
+}
+
+/* Estilo para cada columna */
+.div-container {
+    margin: 0 auto; /* Esto centra el contenedor horizontalmente */
+    width: 70%;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/**************************** FORM *****************************************/
+
+/* Estilo general para centrar el formulario */
+.generic-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 0 auto; /* Centra el formulario horizontalmente */
+    width: 70%;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estructura de los elementos del formulario */
+.generic-form .field-container {
+    display: flex;
+    flex-direction: column; /* Label encima del input */
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+/* Estilo para los labels */
+.generic-form label {
+    color: #4b3a2f;
+    font-weight: 600;
+    margin-bottom: 5px; /* Espacio debajo del label */
+}
+
+/* Estilos para los inputs y selects */
+.generic-form input[type="text"],
+.generic-form input[type="number"],
+.generic-form input[type="time"],
+.generic-form input[type="date"],
+.generic-form input[type="datetime-local"],
+.generic-form textarea,
+.generic-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+}
+
+/* Estilo para el contenedor principal de los subformularios */
+#container-form-secundary {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Estilos para cada sección de productos y menús */
+.form-secundary {
+    flex: 1;
+    background-color: #e7cbbc;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de las secciones */
+.form-secundary h3 {
+    font-size: 1.5rem;
+    color: #4b3a2f;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Contenedor de productos y menús */
+#productos-container, #menus-container {
+    margin-top: 10px;
+}
+
+/* Estilo de las entradas de productos y menús en una sola línea */
+.producto-entry, .menu-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre los elementos */
+    margin-bottom: 10px;
+}
+
+.producto-entry select, 
+.menu-entry select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    height: 45px;
+}
+
+.producto-entry input[type="number"], 
+.menu-entry input[type="number"] {
+    width: 60px; /* Ajusta el ancho a un tamaño más pequeño */
+    padding: 6px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    height: 45px;
+}
+
+/* Estilos para las categorías */
+option.categoria-principal {
+    background-color: #f6d9c3; /* Marrón claro */
+}
+
+option.categoria-raciones {
+    background-color: #fff3b3; /* Amarillo claro */
+}
+
+option.categoria-bebida {
+    background-color: #b3e0ff; /* Azul claro */
+}
+
+option.categoria-postre {
+    background-color: #f4cad4; /* Rosita claro */
+}
+
+/* Contenedor para alinear los botones de "Volver" y "Guardar Pedido" */
+.button-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
