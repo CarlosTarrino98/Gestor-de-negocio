@@ -79,3 +79,18 @@ body {
     font-weight: 600;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
+
+.logout-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.logout-btn img {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.logout-btn img:hover {
+    transform: scale(1.1);
+}

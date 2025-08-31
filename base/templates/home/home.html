@@ -17,6 +17,15 @@
         {% block header %}
             <header id="main-header">
                 <h1>Gestión de negocio - Pettisso</h1>
+
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'logout' %}" class="logout-btn">
+                        {% csrf_token %}
+                        <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                            <img src="{% static 'iconos/logout.png' %}" alt="Salir" style="width:32px;height:32px;">
+                        </button>
+                    </form>
+                {% endif %}
             </header>
 
             <h3 class="titulo">SECCIONES</h3>

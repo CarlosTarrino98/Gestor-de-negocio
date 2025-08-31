@@ -188,14 +188,16 @@ class PedidoListView(ListView):
         context['total_cachopos_lomo'] = total_cachopos_lomo
         context['total_cachopos_degustacion'] = total_cachopos_degustacion
 
-        # Obtener inventarios 
-        inventario_pollo = get_object_or_404(Inventario, producto_id=1)
-
-        # Añadir inventario de pollo al contexto
-        context['inventario_pollos'] = inventario_pollo
-
-        # obtenemos el recuento de pollos restantes
-        context['pollos_restantes'] = inventario_pollo.cantidad_disponible - total_pollos
+        # Obtener inventarios
+        inventario_pollo = Inventario.objects.filter(producto_id=1).first()
+        if inventario_pollo:
+            # Añadir inventario de pollo al contexto
+            context['inventario_pollos'] = inventario_pollo
+            # obtenemos el recuento de pollos restantes
+            context['pollos_restantes'] = inventario_pollo.cantidad_disponible - total_pollos
+        else:
+            context['inventario_pollos'] = None
+            context['pollos_restantes'] = 0
 
         # añadimos el total de ventas  al contexto
         context['total_ventas'] = total_ventas 

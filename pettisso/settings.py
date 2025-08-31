@@ -77,12 +77,8 @@ WSGI_APPLICATION = 'pettisso.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',   # Motor de la base de datos
-        'NAME': 'pettisso',                     # Nombre de la base de datos
-        'USER': 'root',                         # Usuario de la base de datos
-        'PASSWORD': 'cataes33',                         # Contraseña de la base de datos
-        'HOST': 'localhost',                    # Host de la base de datos
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
