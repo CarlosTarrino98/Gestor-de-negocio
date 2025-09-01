@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
@@ -13,8 +15,13 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
 
-class CompraListView(TemplateView):
+class CompraListView(LoginRequiredMixin, TemplateView):
     template_name = 'carniceria/compras/lista_compras.html'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

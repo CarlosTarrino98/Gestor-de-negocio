@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -10,10 +12,14 @@ from base.forms import PedidoForm
 from base.models import Inventario, Menu, Pedido, PedidoMenu, PedidoProducto, Producto, ResumenVentas
 
 # Listar todos los pedidos
-class PedidoListView(ListView):
+class PedidoListView(LoginRequiredMixin, ListView):
     model = Pedido
     template_name = 'asador/pedidos/lista_pedidos.html'
     context_object_name = 'pedidos'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
 
     # Método para el cierre del día
     def cierre_dia(self, fecha, numero_pedidos, total_pollos, total_cachopos, total_ventas, overwrite=False):

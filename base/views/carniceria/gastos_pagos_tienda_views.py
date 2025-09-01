@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import make_aware
 from django.views.generic.base import TemplateView
@@ -9,8 +11,12 @@ from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from base.forms import GastosTiendaForm, GastosPersonalesForm, PagosBancoForm
 
-class GastosPagosListView(TemplateView):
+class GastosPagosListView(LoginRequiredMixin, TemplateView):
     template_name = 'carniceria/gastos_pagos/lista_gastos_pagos_tienda.html'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

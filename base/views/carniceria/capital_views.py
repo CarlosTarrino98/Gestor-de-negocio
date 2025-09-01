@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, TemplateView
@@ -10,8 +12,13 @@ from base.models import Capital
 from django.db.models import Sum
 
 
-class CapitalListView(TemplateView):
+class CapitalListView(LoginRequiredMixin, TemplateView):
     template_name = 'carniceria/capital/lista_capital.html'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

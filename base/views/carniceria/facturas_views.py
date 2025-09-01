@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404
@@ -13,11 +14,16 @@ import pdfkit
 from django.conf import settings
 from bs4 import BeautifulSoup
 
-class FacturaListView(ListView):
+class FacturaListView(LoginRequiredMixin, ListView):
     model = Factura
     template_name = 'carniceria/facturas/lista_facturas.html'
     context_object_name = 'facturas'
     ordering = ['numero_factura']
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

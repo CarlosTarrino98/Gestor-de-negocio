@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -7,11 +9,15 @@ from base.forms import GastoForm
 from base.models import Gasto
 from django.utils.timezone import make_aware
 
-class GastoListView(ListView):
+class GastoListView(LoginRequiredMixin, ListView):
     model = Gasto
     template_name = 'asador/gastos/lista_gastos.html'
     context_object_name = 'gastos'
     ordering = ['fecha']
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,13 +1,18 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from base.models import Inventario
 
-class InventarioListView(ListView):
+class InventarioListView(LoginRequiredMixin, ListView):
     model = Inventario
     template_name = 'asador/inventario/lista_inventario.html'
     context_object_name = 'inventarios'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
 
     def post(self, request, *args, **kwargs):
         if request.POST.get('accion') == 'eliminar':

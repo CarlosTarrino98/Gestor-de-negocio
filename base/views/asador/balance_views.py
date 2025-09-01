@@ -1,12 +1,17 @@
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views import View
 from base.models import Gasto, ResumenVentas
 from django.db.models import Sum
 from decimal import Decimal
 
-class BalanceAsadorView(View):
-    
+class BalanceAsadorView(LoginRequiredMixin, View):
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
+
     def get(self, request):
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_fin = request.GET.get('fecha_fin')

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -5,12 +6,16 @@ from django.http import JsonResponse
 from base.forms import MenuForm
 from base.models import Menu, MenuProducto, Producto
 
-class MenuListView(ListView):
+class MenuListView(LoginRequiredMixin, ListView):
     model = Menu
     template_name = 'asador/menus/lista_menus.html'
     context_object_name = 'menus'
     ordering = ['nombre']
-    
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
+
     def post(self, request, *args, **kwargs):
         if request.POST.get('accion') == 'eliminar':
             menu_id = request.POST.get('menu_id')

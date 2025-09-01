@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import json
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import make_aware
 from django.views.generic.base import TemplateView
@@ -10,8 +12,12 @@ from base.models import Venta
 from base.forms import VentaForm
 
 
-class VentaListView(TemplateView):
+class VentaListView(LoginRequiredMixin, TemplateView):
     template_name = 'carniceria/ventas/lista_ventas.html'
+
+    # Configuración de LoginRequiredMixin
+    login_url = 'login'
+    redirect_field_name = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
